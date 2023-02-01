@@ -4,11 +4,12 @@ import Prodimages from "./prodimages";
 import "./home.css"
 const Home = () => {
     const [prodata, setProdata] = useState([])
-    const [currentPage,setCurrentpage]=useState(1);
-    const [postsperpage]=useState(10);
-    const [state,setState]=useState(true);
-    const lastpageindex=currentPage*postsperpage;
-    const firstpageindex=lastpageindex-postsperpage;
+    const [currentPage, setCurrentpage] = useState(1);
+    const [category, setcategory] = useState([])
+    const [postsperpage] = useState(10);
+    const [state, setState] = useState(true);
+    const lastpageindex = currentPage * postsperpage;
+    const firstpageindex = lastpageindex - postsperpage;
     useEffect(() => {
         const url = 'https://dummyjson.com/products';
         const options = {
@@ -20,36 +21,37 @@ const Home = () => {
         };
         fetch(url, options)
             .then(res => res.json())
-            .then((res)=>{
+            .then((res) => {
                 //console.log(res.products[0]);
-                setProdata(res.products);
+                setProdata(res.products.sort((a, b) => b.rating - a.rating));
             })
             .catch(err => console.error('error:' + err));
-    },[])
+    }, [])
 
-    const currentdata=prodata.slice(firstpageindex,lastpageindex)
-    const paginate=(pagenumber)=>{
+    const currentdata = prodata.slice(firstpageindex, lastpageindex)
+    const paginate = (pagenumber) => {
         setCurrentpage(pagenumber);
-     }
-     const hadlechange=(e)=>{
+    }
+    const hadlechange = (e) => {
         console.log(e.target.value)
-        if(e.target.value!=="all"){
-            const categorydata=prodata.filter((item)=>{
+        if (e.target.value !== "all") {
+            const categorydata = prodata.filter((item) => {
                 return item.category.includes(e.target.value)
             })
+            setcategory(categorydata)
             setProdata(categorydata)
         }
-        else{
+        else {
             setState(true)
         }
-     }
+    }
     return (
         <>
             <div className="heading">
                 <h1>Available Products</h1>
             </div>
             <div className="dragdown">
-                <select onChange={(e)=>{hadlechange(e)}}>
+                <select onChange={(e) => { hadlechange(e) }}>
                     <option value="all">All</option>
                     <option value="smartphones">Smartphones</option>
                     <option value="laptops">Laptops</option>
@@ -60,10 +62,16 @@ const Home = () => {
                 </select>
             </div>
             <div className="images">
-                <Prodimages posts={currentdata} />
-                <Pagination perpageimages={postsperpage}
-                totalposts={prodata.length}
-                paginate={paginate}/>
+                {category.length ? (category.map((post) => {
+                    return (
+                        <img src={post.images[0]} alt="#img" style={{ width: "250px", height: "250px" }} />
+                    )
+                })):<><Prodimages posts={currentdata} />
+                    <Pagination perpageimages={postsperpage}
+                        totalposts={prodata.length}
+                        paginate={paginate} />
+                </>}
+
             </div>
         </>
     )
