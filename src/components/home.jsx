@@ -39,10 +39,9 @@ const Home = () => {
                 return item.category.includes(e.target.value)
             })
             setcategory(categorydata)
-            setProdata(categorydata)
         }
         else {
-            setState(true)
+            setcategory([])
         }
     }
     return (
